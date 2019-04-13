@@ -1,0 +1,5 @@
+flask
+flask-mysql
+beautifulsoup4
+flask-cors
+requests
