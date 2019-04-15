@@ -279,6 +279,10 @@ def getTitles(keyword):
 
 @app.route("/scrape/<string:keyword>")
 def getScrape(keyword):
+
+    if keyword=="Object oriented":
+        keyword="Object"
+    print("Keyword: "+keyword )
     headers = {'Accept-Encoding': 'identity'}
     test=requests.get("https://www.tutorialspoint.com/java/",headers=headers)
 
@@ -366,7 +370,7 @@ def getScrape(keyword):
 
 
 
-    return jsonify({'Subject':keyword,'Links':[{'Links':jsonLink, 'title': "jsonLink"},{'OracleLinks':jsonOracle, 'title': 'Oracle'},{"W3Links":jsonW3, 'title': 'W3'},{"GeeksLinks":jsonGeeks, 'title': 'Geeks'}]})
+    return jsonify({'Subject':keyword,'Links':[{'linksArray':jsonLink, 'title': "Tutorialpoints"},{'linksArray':jsonOracle, 'title': 'Oracle'},{"linksArray":jsonW3, 'title': 'W3'},{"linksArray":jsonGeeks, 'title': 'Geeks'}]})
 
 @app.route("/array", methods=["POST"])
 def arr():
@@ -404,8 +408,8 @@ def arr():
             json_data.append(dict(zip(row_headers,ans)))
 
             if str(value)==str(json_data[counter].get("answer")):
-                print("DEBUG:!!!!!!"+json_data[counter].get("subject")== "Arv")
-                if json_data[counter].get("subject")== "Arv":
+                print("DEBUG:!!!!!!"+json_data[counter].get("subject")== "Inheritance")
+                if json_data[counter].get("subject")== "Inheritance":
 
                     antalArv+=1
                 elif json_data[counter].get("subject")=="Objectoriented":
@@ -487,11 +491,11 @@ def testRoute():
                     if str(jsonArv[x].get('subject'))=="Objectoriented":
                         ooCounter+=1
 
-                    if str(jsonArv[x].get('subject'))=="Arv":
+                    if str(jsonArv[x].get('subject'))=="Inheritance":
                         arvCounter+=1
                     if str(jsonArv[x].get('subject')) == "Java":
                         javaCounter+=1
-                    if str(jsonArv[x].get('subject')) == "Överskuggning":
+                    if str(jsonArv[x].get('subject')) == "Override":
                         overrideCounter+=1
                     if str(jsonArv[x].get('subject')) == "Exception handling":
                         exeCounter+=1
@@ -536,7 +540,7 @@ def testRoute():
 
 
     print(data_result)
-    return jsonify({'Interface':interfaceCounter,'MaxInterface':getMaxFromDb('Interface'),'Arv':arvCounter,'MaxArv':getMaxFromDb('Arv'),'Exception handling':exeCounter,'MaxException':getMaxFromDb('Exception handling'),'Överskuggning':overrideCounter,'MaxÖverskuggning':getMaxFromDb('Överskuggning'),'Objectoriented':ooCounter,'MaxObjectoriented':getMaxFromDb('Objectoriented'),'Java':javaCounter,'MaxJava':getMaxFromDb('Java')})
+    return jsonify({'Interface':interfaceCounter,'MaxInterface':getMaxFromDb('Interface'),'Inheritance':arvCounter,'MaxInheritance':getMaxFromDb('Inheritance'),'Exception handling':exeCounter,'MaxException':getMaxFromDb('Exception handling'),'Override':overrideCounter,'MaxOverride':getMaxFromDb('Override'),'Objectoriented':ooCounter,'MaxObjectoriented':getMaxFromDb('Objectoriented'),'Java':javaCounter,'MaxJava':getMaxFromDb('Java')})
 def getMaxFromDb(sub):
 
     select_count = "select count(*) from questions where subject= '"+sub+"'"
@@ -620,14 +624,14 @@ def getResultat(userid):
                 json_data.append(resultDict)
 
             elif key=="antalOverride":
-                json_data.append(resultDictionary(tempdict,"Override","antalOverride","Överskuggning"))
+                json_data.append(resultDictionary(tempdict,"Override","antalOverride","Override"))
                 #resultDict(tempdict, field, antal, max)
 
             elif key=="antalOO":
                 json_data.append(resultDictionary(tempdict,"Object oriented","antalOO","Objectoriented"))
 
             elif key=="antalArv":
-                json_data.append(resultDictionary(tempdict,"Arv","antalArv","Arv"))
+                json_data.append(resultDictionary(tempdict,"Inheritance","antalArv","Inheritance"))
 
 
 
@@ -656,5 +660,37 @@ def test3():
 
     print(answers)
     return "Hello"
+@app.route("/checkresult/<string:id>", methods=["GET"])
+def checkresult(id):
+
+    select_result = "SELECT * FROM results WHERE  idUser= " +id
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    cursor.execute(select_result)
+    json_data = []
+    row_headers = [x[0] for x in cursor.description]
+
+    results = cursor.fetchall()
+
+    for result in results:
+
+        json_data.append((dict(zip(row_headers, result))))
+
+    conn.close()
+
+
+
+
+
+
+
+
+
+    if len(json_data)<1:
+
+        return jsonify({"result":False})
+    else: return jsonify({"result":True})
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run()
