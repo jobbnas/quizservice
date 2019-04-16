@@ -692,5 +692,26 @@ def checkresult(id):
         return jsonify({"result":False})
     else: return jsonify({"result":True})
 
+@app.route("/checker")
+def getCheck():
+
+    select_check = "SELECT questions.question, answer.answer FROM questions INNER JOIN answer ON questions.idquestions = answer.questions_idquestions AND answer.rightAnswer =1"
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute(select_check)
+
+    questionAnswer = cursor.fetchall()
+    row_headers = [x[0] for x in cursor.description]
+    conn.close
+
+    json_data = []
+
+    for qa in questionAnswer:
+
+        json_data.append((dict(zip(row_headers, qa))))
+
+
+    return jsonify({'AnswerQuestion':json_data})
+
 if __name__ == '__main__':
-    app.run()
+    app.run("0.0.0.0", debug=True)
